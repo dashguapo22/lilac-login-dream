@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alumni: {
+        Row: {
+          id: string;
+          name: string;
+          program: string | null;
+          year_graduated: number | null;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          program?: string | null;
+          year_graduated?: number | null;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          program?: string | null;
+          year_graduated?: number | null;
+        };
+      };
+      feedback: {
+        Row: {
+          id: string;
+          alumni_id: string;
+          employment_status: string | null;
+          industry: string | null;
+          skill_relevance_rating: number | null;
+          feedback_text: string | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          alumni_id: string;
+          employment_status?: string | null;
+          industry?: string | null;
+          skill_relevance_rating?: number | null;
+          feedback_text?: string | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          alumni_id?: string;
+          employment_status?: string | null;
+          industry?: string | null;
+          skill_relevance_rating?: number | null;
+          feedback_text?: string | null;
+          created_at?: string | null;
+        };
+      };
+      skills: {
+        Row: {
+          id: string;
+          skill_name: string;
+          required_level: number | null;
+          acquired_level: number | null;
+        };
+        Insert: {
+          id?: string;
+          skill_name: string;
+          required_level?: number | null;
+          acquired_level?: number | null;
+        };
+        Update: {
+          id?: string;
+          skill_name?: string;
+          required_level?: number | null;
+          acquired_level?: number | null;
+        };
+      };
     }
     Views: {
       [_ in never]: never
