@@ -206,7 +206,7 @@ const Dashboard = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    navigate("/auth");
+    window.location.href = `${window.location.origin}/auth`;
   };
 
   if (authLoading) {

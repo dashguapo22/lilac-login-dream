@@ -34,6 +34,7 @@ const Index = () => {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast({ title: "Signed out" });
+    window.location.href = `${window.location.origin}/auth`;
   };
 
   if (loading) {

@@ -5,8 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, Mail, Lock, ArrowRight, User, BookOpen, Calendar } from "lucide-react";
 import ReCAPTCHA from "react-google-recaptcha";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type AuthView = "login" | "signup" | "forgot";
 
@@ -14,6 +21,10 @@ const Auth = () => {
   const [view, setView] = useState<AuthView>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [course, setCourse] = useState("");
+  const [yearGraduated, setYearGraduated] = useState("");
   const [loading, setLoading] = useState(false);
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const { toast } = useToast();
@@ -55,12 +66,16 @@ const Auth = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim() || !fullName.trim() || !course || !yearGraduated) {
       toast({ title: "Please fill in all fields", variant: "destructive" });
       return;
     }
     if (password.length < 6) {
       toast({ title: "Password must be at least 6 characters", variant: "destructive" });
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast({ title: "Passwords do not match", variant: "destructive" });
       return;
     }
     if (!captchaToken) {
@@ -76,6 +91,9 @@ const Auth = () => {
         body: JSON.stringify({
           email: email.trim(),
           password,
+          fullName: fullName.trim(),
+          course,
+          yearGraduated,
           captchaToken,
         }),
       });
@@ -88,6 +106,10 @@ const Auth = () => {
         toast({ title: "Account created!", description: "Check your email to verify." });
         setEmail("");
         setPassword("");
+        setConfirmPassword("");
+        setFullName("");
+        setCourse("");
+        setYearGraduated("");
         setCaptchaToken(null);
         if (recaptchaRef.current) {
           recaptchaRef.current.reset();
@@ -153,6 +175,24 @@ const Auth = () => {
         <Card className="border-border/50 shadow-xl shadow-primary/5">
           <CardContent className="pt-6">
             <form onSubmit={onSubmit} className="space-y-4">
+              {view === "signup" && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Juan Dela Cruz"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="pl-10"
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <div className="relative">
@@ -170,6 +210,48 @@ const Auth = () => {
                 </div>
               </div>
 
+              {view === "signup" && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="course">Course</Label>
+                      <Select value={course} onValueChange={setCourse} disabled={loading}>
+                        <SelectTrigger id="course" className="w-full">
+                          <SelectValue placeholder="Select course" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Bachelor of Science in Accountancy">Bachelor of Science in Accountancy</SelectItem>
+                          <SelectItem value="Bachelor of Science in Business Administration">Bachelor of Science in Business Administration</SelectItem>
+                          <SelectItem value="Bachelor of Science in Hospitality Management / Associate in Hospitality Management">Bachelor of Science in Hospitality Management / Associate in Hospitality Management</SelectItem>
+                          <SelectItem value="Bachelor of Science in Tourism Management">Bachelor of Science in Tourism Management</SelectItem>
+                          <SelectItem value="Bachelor of Science in Information Technology / Associate in Information Technology">Bachelor of Science in Information Technology / Associate in Information Technology</SelectItem>
+                          <SelectItem value="Bachelor of Science in Computer Science">Bachelor of Science in Computer Science</SelectItem>
+                          <SelectItem value="Bachelor of Science in Information Systems">Bachelor of Science in Information Systems</SelectItem>
+                          <SelectItem value="Bachelor of Science in Computer Engineering">Bachelor of Science in Computer Engineering</SelectItem>
+                          <SelectItem value="Bachelor of Secondary Education">Bachelor of Secondary Education</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="yearGraduated">Year Graduated</Label>
+                      <Select value={yearGraduated} onValueChange={setYearGraduated} disabled={loading}>
+                        <SelectTrigger id="yearGraduated" className="w-full">
+                          <SelectValue placeholder="Select year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i).map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </>
+              )}
+
               {view !== "forgot" && (
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
@@ -183,6 +265,25 @@ const Auth = () => {
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10"
                       autoComplete={view === "login" ? "current-password" : "new-password"}
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {view === "signup" && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className="pl-10"
+                      autoComplete="new-password"
                       disabled={loading}
                     />
                   </div>
@@ -276,6 +377,10 @@ const Auth = () => {
                       setView("signup");
                       setEmail("");
                       setPassword("");
+                      setConfirmPassword("");
+                      setFullName("");
+                      setCourse("");
+                      setYearGraduated("");
                       setCaptchaToken(null);
                     }} 
                     className="text-primary font-medium hover:text-primary/80 transition-colors"
@@ -291,6 +396,10 @@ const Auth = () => {
                       setView("login");
                       setEmail("");
                       setPassword("");
+                      setConfirmPassword("");
+                      setFullName("");
+                      setCourse("");
+                      setYearGraduated("");
                       setCaptchaToken(null);
                       if (recaptchaRef.current) {
                         recaptchaRef.current.reset();
