@@ -17,21 +17,27 @@ export type Database = {
       alumni: {
         Row: {
           id: string;
+          email: string | null;
           name: string;
           program: string | null;
           year_graduated: number | null;
+          role: string | null;
         };
         Insert: {
           id?: string;
+          email?: string | null;
           name: string;
           program?: string | null;
           year_graduated?: number | null;
+          role?: string | null;
         };
         Update: {
           id?: string;
+          email?: string | null;
           name?: string;
           program?: string | null;
           year_graduated?: number | null;
+          role?: string | null;
         };
       };
       feedback: {
